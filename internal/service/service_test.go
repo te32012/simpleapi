@@ -155,9 +155,15 @@ func (db *Databasemock) GetListFilmByActorId(ctx context.Context, id_actor int) 
 	return nil, nil
 }
 func (db *Databasemock) AddActorFilmConnection(ctx context.Context, id_actor, id_film int) error {
+	if id_actor == 1 {
+		return errors.New("тестовая ошибка")
+	}
 	return nil
 }
 func (db *Databasemock) DeleteActorFilmConnection(ctx context.Context, id_actor, id_film int) error {
+	if id_actor == 1 {
+		return errors.New("тестовая ошибка")
+	}
 	return nil
 }
 
@@ -495,6 +501,96 @@ func TestService(t *testing.T) {
 	e = service.DeleteActor(data)
 	if e == nil {
 		t.Fatal()
+	}
+
+	var film7 entity.Film
+	film7.Name = "Warhorse One"
+	film7.Id = 1
+	film7.Rating = 10
+	film7.ReleaseDate = time.Now()
+	film7.About = "good film"
+
+	var actor10 entity.Actor
+
+	actor10.Name = "jon"
+	actor10.Sex = "male"
+	actor10.DataOfBirthday = time.Now()
+
+	var connection entity.RequestEditConnection
+	connection.Actor = actor10
+	connection.Film = film7
+
+	data, _ = json.Marshal(connection)
+	data = append(data, 1)
+	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+	data, _ = json.Marshal(connection)
+	data = append(data, 1)
+	e = service.DeleteConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	data, _ = json.Marshal(connection)
+
+	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e != nil {
+		t.Fatal(e)
+	}
+
+	data, _ = json.Marshal(connection)
+
+	e = service.DeleteConnectionBetweenActorAndFilm(data)
+	if e != nil {
+		t.Fatal(e)
+	}
+
+	connection.Actor.Id = 1
+
+	data, _ = json.Marshal(connection)
+
+	e = service.DeleteConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	data, _ = json.Marshal(connection)
+
+	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	connection.Actor.Name = "d"
+
+	e = service.DeleteConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	data, _ = json.Marshal(connection)
+
+	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+	connection.Actor.Name = "jon"
+
+	connection.Film.Name = "s"
+	data, _ = json.Marshal(connection)
+
+	e = service.DeleteConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	data, _ = json.Marshal(connection)
+
+	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
 	}
 
 }

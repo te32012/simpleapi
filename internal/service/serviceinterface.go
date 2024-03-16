@@ -14,4 +14,6 @@ type ServiceInterface interface {
 	GetListFilms(keySort int, orderSort int) ([]byte, error)
 	DeleteFilm(data []byte) error
 	FindInFilm(segment string) ([]byte, error)
+	AddConnectionBetweenActorAndFilm(data []byte) error
+	DeleteConnectionBetweenActorAndFilm(data []byte) error
 }

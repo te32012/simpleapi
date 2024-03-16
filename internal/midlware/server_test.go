@@ -108,6 +108,21 @@ func (s *servicemock) FindInFilm(segment string) ([]byte, error) {
 	return nil, errors.New("тестовая ошибка findinfilm")
 }
 
+func (s *servicemock) AddConnectionBetweenActorAndFilm(data []byte) error {
+	fmt.Println(len(data))
+	if len(data) == 1 && data[0] == 1 {
+		return nil
+	}
+	return errors.New("тестовая ошибка findinfilm")
+}
+func (s *servicemock) DeleteConnectionBetweenActorAndFilm(data []byte) error {
+	fmt.Println(len(data))
+	if len(data) == 1 && data[0] == 1 {
+		return nil
+	}
+	return errors.New("тестовая ошибка findinfilm")
+}
+
 func TestRouter(t *testing.T) {
 	ha := sha256.Sum256([]byte("admin" + time.Now().GoString()))
 	tmp1 := fmt.Sprintf("%x", ha[:16])
@@ -552,6 +567,86 @@ func TestRouter(t *testing.T) {
 
 	tmp, _ = io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusNotFound && resp.Header.Get("session") == tmp2 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/addConnectionBetweenActorAndFilm", bytes.NewReader([]byte{0}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/addConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("GET", "http://localhost:2024/addConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("GET", "http://localhost:2024/addConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp2)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/deleteConnectionBetweenActorAndFilm", bytes.NewReader([]byte{0}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/deleteConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/deleteConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp2)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("GET", "http://localhost:2024/deleteConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp2)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
 		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
 	}
 

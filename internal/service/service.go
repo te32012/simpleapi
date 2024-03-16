@@ -387,3 +387,66 @@ func (s *Service) deltefilm(film entity.Film) error {
 	s.Info.Println("finished delete one film ")
 	return nil
 }
+
+func (s *Service) AddConnectionBetweenActorAndFilm(data []byte) error {
+	s.Info.Println("start add connection between film and actor")
+	var con entity.RequestEditConnection
+	err := json.Unmarshal(data, &con)
+	if err != nil {
+		s.Error.Println("error unmarshal RequestEditConnection in add connection")
+		return err
+	}
+	tmp, err := s.getconnectionbyfilmandactor(con)
+	if err != nil {
+		s.Error.Println("error gets data from base for connection between film and actor")
+		return err
+	}
+	con = *tmp
+	if e := s.DatabaseConnector.AddActorFilmConnection(context.Background(), con.Actor.Id, con.Film.Id); e != nil {
+		s.Error.Println("error add connection between film and actor")
+		return e
+	}
+	s.Info.Println("finished add connection between film and actor")
+	return nil
+}
+
+func (s *Service) DeleteConnectionBetweenActorAndFilm(data []byte) error {
+	s.Info.Println("start delete connection between film and actor")
+	var con entity.RequestEditConnection
+	err := json.Unmarshal(data, &con)
+	if err != nil {
+		s.Error.Println("error unmarshal RequestEditConnection in delete connection")
+		return err
+	}
+	tmp, err := s.getconnectionbyfilmandactor(con)
+	if err != nil {
+		s.Error.Println("error gets data from base for connection between film and actor")
+		return err
+	}
+	con = *tmp
+	if e := s.DatabaseConnector.DeleteActorFilmConnection(context.Background(), con.Actor.Id, con.Film.Id); e != nil {
+		s.Error.Println("error delete connection between film and actor")
+		return e
+	}
+	s.Info.Println("finished delete connection between film and actor")
+	return nil
+
+}
+
+func (s *Service) getconnectionbyfilmandactor(req entity.RequestEditConnection) (*entity.RequestEditConnection, error) {
+	s.Info.Println("start gettiing id film and actor from base")
+	tmp, err := s.DatabaseConnector.GetActor(context.Background(), req.Actor)
+	if err != nil {
+		s.Error.Println("error get actor from base")
+		return nil, err
+	}
+	req.Actor = *tmp
+	tmp1, err := s.DatabaseConnector.GetFilm(context.Background(), req.Film)
+	if err != nil {
+		s.Error.Println("error get film from base")
+		return nil, err
+	}
+	req.Film = *tmp1
+	s.Info.Println("finish gettiing id film and actor from base")
+	return &req, nil
+}

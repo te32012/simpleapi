@@ -1,6 +1,6 @@
 FROM golang:1.22 as build
 COPY . .
-RUN go build -o /server main.go
+RUN go build -o /server ./cmd/main.go
 
 
 

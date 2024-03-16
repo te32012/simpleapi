@@ -3,6 +3,7 @@ package auth_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -13,11 +14,14 @@ import (
 type Databasemock struct {
 }
 
+var userhash string
+var adminhash string
+
 func (db *Databasemock) GetUser(ctx context.Context, login string, password string) (*entity.User, error) {
-	if "user" == login && "pswd" == password {
+	if "user" == login && userhash == password {
 		return &entity.User{Id: 1, Login: "user", Password: "pswrd", Permission: entity.UserPermission}, nil
 	}
-	if "admin" == login && "admin" == password {
+	if "admin" == login && adminhash == password {
 		return &entity.User{Id: 1, Login: "admin", Password: "admin", Permission: entity.AdminPermission}, nil
 	}
 
@@ -54,9 +58,12 @@ func (db *Databasemock) DeleteActorFilmConnection(ctx context.Context, id_actor,
 
 func TestAuthService(t *testing.T) {
 	auth := auth.NewAutService(&Databasemock{}, log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile), log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile))
+	userhash = fmt.Sprintf("%x", auth.Hasher.Sum([]byte("pswd")))
+	adminhash = fmt.Sprintf("%x", auth.Hasher.Sum([]byte("admin")))
+
 	hash, e := auth.LoginUser("user", "pswd")
 	if e != nil {
-		t.Fatal()
+		t.Fatal(e)
 		return
 	}
 
