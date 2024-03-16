@@ -1,0 +1,5 @@
+.vscode
+.vscode/*
+coverage.txt
+index.html
+dockerfiletest
