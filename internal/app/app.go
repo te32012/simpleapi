@@ -16,10 +16,14 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const uridb = "postgres://root:pass@postgres:5432/root"
+const uridb = "postgres://root:root@postgres:5432/root"
 
 func Run() {
 	db, err := sql.Open("pgx", uridb)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = db.Ping()
 	if err != nil {
 		log.Fatalln(err)
 	}

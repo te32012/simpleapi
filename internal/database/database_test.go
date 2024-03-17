@@ -180,7 +180,7 @@ func TestDB(t *testing.T) {
 		t.Fatal(film)
 	}
 	film, err = conector.GetFilm(context.Background(), entity.Film{Name: "d", ReleaseDate: d})
-	if err == nil {
+	if film != nil {
 		t.Fatal(err)
 	}
 	err = conector.DeleteFilm(context.Background(), entity.Film{Id: 15})

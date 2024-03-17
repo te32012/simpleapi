@@ -364,8 +364,8 @@ func (s *Service) editfilm(request entity.RequestEditFilm) error {
 func (s *Service) deltefilm(film entity.Film) error {
 	s.Info.Println("start delete one film ")
 	if film.Id != 0 {
-		s.Error.Println("invalide film data ")
-		return errors.New("invalide film data")
+		s.Error.Println("invalide film id ")
+		return errors.New("invalide film id")
 
 	}
 	s.Info.Println(film)

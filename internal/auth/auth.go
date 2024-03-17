@@ -26,9 +26,10 @@ func NewAutService(base database.DatabaseConnectorInterface, info *log.Logger, e
 
 func (s *AuthService) LoginUser(login string, password string) (string, error) {
 	tmp := fmt.Sprintf("%x", s.Hasher.Sum([]byte(password)))
-	s.INFO.Println(tmp)
+	// s.INFO.Println(tmp)
 	user, err := s.DatabaseConnector.GetUser(context.Background(), login, tmp)
 	if err != nil {
+		s.ERROR.Println("ошибка получения юзера")
 		return "", err
 	}
 	var hashstr string = ""
@@ -45,6 +46,7 @@ func (s *AuthService) LoginUser(login string, password string) (string, error) {
 
 func (s *AuthService) CheckUserIsLoginedAndHasPermission(key string, operation int) (*entity.User, bool) {
 	u, e := s.userIdentificationBySession(key)
+	s.ERROR.Println("ошибка идентификации юзера")
 	if e != nil {
 		return nil, false
 	}
@@ -59,7 +61,7 @@ func (s *AuthService) userIdentificationBySession(key string) (*entity.User, err
 	return u, nil
 }
 func (s *AuthService) checkingPermissionToPerformAnOperation(user *entity.User, operation int) bool {
-	switch operation {
+	switch user.Permission {
 	case 2:
 		return true
 	case 1:

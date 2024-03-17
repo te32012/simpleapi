@@ -73,10 +73,58 @@ $BODY$;
 ALTER FUNCTION public.make_tsvector(integer)
     OWNER TO root;
 
--- INSERT INTO users(username, hpassword, permission) VALUES ('admin', 'admin', 1) RETURNING id;
--- DECLARE i2 integer := INSERT INTO users(username, hpassword, permission) VALUES ('user', 'user', 2) RETURNING id;
 
--- DECLARE i3 integer := INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('anna', 'female', '03-05-1998') RETURNING id;
+with a as (
+        INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('anna', 'female', '03-05-1998') RETURNING id
+), f as (
+    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino1', 'good film', '03-05-1959', 2) RETURNING id
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+
+with a as (
+        INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('tanya', 'female', '03-05-1999') RETURNING id
+), f as (
+    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino2', 'normal film', '05-05-1969', 5) RETURNING id
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+
+with a as (
+        INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('ivan', 'male', '06-09-1995') RETURNING id
+), f as (
+    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino3', 'bad film', '03-05-1979', 9) RETURNING id
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+
+INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('petya', 'male', '03-05-1978') RETURNING id;
+INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino7', 'worse film that i watch', '03-05-2000', 7) RETURNING id;
+with a as (
+        select * from actors where nameActor='petya' and sex='male' and dataofbirthday='03-05-1978'
+), f as (
+    select * from films where nameOfFilm='kino3' and about='bad film' and releaseDate='03-05-1979' and rating=9
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+with a as (
+        select * from actors where nameActor='petya' and sex='male' and dataofbirthday='03-05-1978'
+), f as (
+    select * from films where nameOfFilm='kino2' and about='normal film' and releaseDate='05-05-1969' and rating=5
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+with a as (
+        select * from actors where nameActor='tanya' and sex='female' and dataofbirthday='03-05-1999'
+), f as (
+    select * from films where nameOfFilm='kino1' and about='good film' and releaseDate='03-05-1959' and rating=2
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+
+
+with a as (
+        INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('anna', 'female', '03-05-1998') RETURNING id
+), f as (
+    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino9', 'good film', '03-05-1959', 2) RETURNING id
+)
+INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
+
+
 -- DECLARE i4 integer := INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('ivan', 'male','02-08-2005') RETURNING id;
 -- DECLARE i5 integer := INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('vasya', 'male', '03-05-1989') RETURNING id;
 -- DECLARE i6 integer := INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('petya', 'male', '03-05-2003') RETURNING id;

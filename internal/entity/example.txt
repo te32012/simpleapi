@@ -1,0 +1,59 @@
+"редактирование актера"
+{
+    "oldactor":{
+                "name": "katya",
+                "sex": "male",
+                "dataofbirthday": "1948-03-05T00:00:00Z"
+                },
+    "newactor":{
+        "name": "katya",
+        "sex": "male",
+        "dataofbirthday": "1949-03-05T00:00:00Z"
+    }
+}
+"редактирование фильма"
+{
+    "oldfilm":{
+        "name": "kino9",
+        "about": "good film",
+        "releasedate": "1959-03-05T00:00:00Z",
+        "rating": 2
+    },
+    "newfilm":{
+        "name": "kino9",
+        "about": "good film",
+        "releasedate": "1959-03-05T00:00:00Z",
+        "rating": 2
+    }
+}
+"удаление или создание связи"
+{
+    "film":{
+        "name": "kino9",
+        "about": "good film",
+        "releasedate": "1959-03-05T00:00:00Z",
+        "rating": 2
+    },
+    "actor":{
+        "name": "anna",
+        "sex": "female",
+        "dataofbirthday": "1998-03-05T00:00:00Z"
+    }
+}
+
+"актер"
+{
+    "id": 4,
+    "name": "petya",
+    "sex": "male",
+    "dataofbirthday": "1978-03-05T00:00:00Z"
+}
+"фильм"
+{
+    "id": 5,
+    "name": "kino9",
+    "about": "good film",
+    "releasedate": "1959-03-05T00:00:00Z",
+    "rating": 2
+}
+

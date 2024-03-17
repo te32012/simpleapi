@@ -22,7 +22,7 @@ services:
     # command: "-c logging_collector=on && -c log_statement=all && -c log_min_error_statement=DEBUG1 && -c log_destination=stderr"
     environment:
       - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=pass
+      - POSTGRES_PASSWORD=root
     ports:
       - 5432:5432
     healthcheck:
