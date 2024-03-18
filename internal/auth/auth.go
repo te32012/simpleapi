@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"crypto"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"hash"
@@ -25,7 +26,7 @@ func NewAutService(base database.DatabaseConnectorInterface, info *log.Logger, e
 }
 
 func (s *AuthService) LoginUser(login string, password string) (string, error) {
-	tmp := fmt.Sprintf("%x", s.Hasher.Sum([]byte(password)))
+	tmp := fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
 	// s.INFO.Println(tmp)
 	user, err := s.DatabaseConnector.GetUser(context.Background(), login, tmp)
 	if err != nil {
@@ -35,7 +36,7 @@ func (s *AuthService) LoginUser(login string, password string) (string, error) {
 	var hashstr string = ""
 	var ok = true
 	for ok {
-		var hash = crypto.SHA256.New().Sum([]byte(user.Login + time.Now().GoString()))
+		var hash [32]byte = sha256.Sum256([]byte(user.Login + time.Now().Format("2006-01-02T15:04:05.999999999Z07:00")))
 		hashstr = fmt.Sprintf("%x", hash[:16])
 		_, ok = s.Session[hashstr]
 	}

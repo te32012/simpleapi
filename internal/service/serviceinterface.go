@@ -16,4 +16,5 @@ type ServiceInterface interface {
 	FindInFilm(segment string) ([]byte, error)
 	AddConnectionBetweenActorAndFilm(data []byte) error
 	DeleteConnectionBetweenActorAndFilm(data []byte) error
+	AddFilmWithActor(data []byte) error
 }

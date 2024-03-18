@@ -18,7 +18,7 @@ services:
         condition: service_healthy
   postgres:
     container_name: postgres
-    image: postgres:15-alpine
+    image: postgres:latest
     # command: "-c logging_collector=on && -c log_statement=all && -c log_min_error_statement=DEBUG1 && -c log_destination=stderr"
     environment:
       - POSTGRES_USER=root

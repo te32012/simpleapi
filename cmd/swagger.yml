@@ -40,6 +40,15 @@ definitions:
         type: object
         x-go-name: Actor
         x-go-package: vktestgo2024/internal/entity
+    connection:
+        properties:
+            actor:
+                $ref: '#/definitions/actor'
+            film:
+                $ref: '#/definitions/film'
+        type: object
+        x-go-name: RequestEditConnection
+        x-go-package: vktestgo2024/internal/entity
     editactor:
         properties:
             newactor:
@@ -151,11 +160,69 @@ paths:
                 "500":
                     description: ""
             summary: Added one actor in base
+    /addConnectionBetweenActorAndFilm:
+        post:
+            consumes:
+                - application/json
+            operationId: addConnectionBetweenActorAndFilm
+            parameters:
+                - description: current session of user (we can use some computers in one time for one user)
+                  in: header
+                  name: session
+                  required: true
+                  type: string
+                - description: film and actor data
+                  in: body
+                  name: connection
+                  required: true
+                  schema:
+                    $ref: '#/definitions/connection'
+                    description: film and actor data
+                    type: object
+            responses:
+                "200":
+                    description: ""
+                "400":
+                    description: ""
+                "405":
+                    description: ""
+                "500":
+                    description: ""
+            summary: added information that actor was in film
     /addFilm:
         post:
             consumes:
                 - application/json
             operationId: addFilm
+            parameters:
+                - description: current session of user (we can use some computers in one time for one user)
+                  in: header
+                  name: session
+                  required: true
+                  type: string
+                - description: create film in database
+                  in: body
+                  name: film
+                  required: true
+                  schema:
+                    $ref: '#/definitions/film'
+                    description: create film in database
+                    type: object
+            responses:
+                "200":
+                    description: ""
+                "400":
+                    description: ""
+                "405":
+                    description: ""
+                "500":
+                    description: ""
+            summary: add one film
+    /addFilmWithActor:
+        post:
+            consumes:
+                - application/json
+            operationId: addFilmWithActor
             parameters:
                 - description: current session of user (we can use some computers in one time for one user)
                   in: header
@@ -207,6 +274,35 @@ paths:
                 "500":
                     description: ""
             summary: delete one actor
+    /deleteConnectionBetweenActorAndFilm:
+        post:
+            consumes:
+                - application/json
+            operationId: deleteConnectionBetweenActorAndFilm
+            parameters:
+                - description: current session of user (we can use some computers in one time for one user)
+                  in: header
+                  name: session
+                  required: true
+                  type: string
+                - description: film and actor data
+                  in: body
+                  name: connection
+                  required: true
+                  schema:
+                    $ref: '#/definitions/connection'
+                    description: film and actor data
+                    type: object
+            responses:
+                "200":
+                    description: ""
+                "400":
+                    description: ""
+                "405":
+                    description: ""
+                "500":
+                    description: ""
+            summary: delete information that actor was in film
     /deleteFilm:
         post:
             consumes:

@@ -137,6 +137,23 @@ func (s *Service) AddFilm(data []byte) error {
 	return nil
 }
 
+func (s *Service) AddFilmWithActor(data []byte) error {
+	s.Info.Println("start adding one film")
+	var film entity.Film
+	err := json.Unmarshal(data, &film)
+	s.Info.Println(film)
+	if err != nil {
+		s.Error.Println("error unmarshal film")
+		return err
+	}
+	if e := s.addfilmwithactor(film); e != nil {
+		s.Error.Println("error adding one film")
+		return e
+	}
+	s.Info.Println("finised adding one film")
+	return nil
+}
+
 func (s *Service) EditFilm(data []byte) error {
 	s.Info.Println("start edit one film without actors and id")
 	var request entity.RequestEditFilm
@@ -303,7 +320,6 @@ func (s *Service) addfilm(film entity.Film) error {
 	valid = valid && len(film.About) < 1000
 	valid = valid && film.Rating >= 0 && film.Rating <= 10
 	valid = valid && film.Id == 0
-	valid = valid && (film.Actors == nil || len(film.Actors) == 0)
 	if !valid {
 		s.Error.Println("invalide data about film")
 		return errors.New("полученные данные про фильм не корректные")
@@ -449,4 +465,25 @@ func (s *Service) getconnectionbyfilmandactor(req entity.RequestEditConnection) 
 	req.Film = *tmp1
 	s.Info.Println("finish gettiing id film and actor from base")
 	return &req, nil
+}
+func (s *Service) addfilmwithactor(film entity.Film) error {
+	s.Info.Println("start adding film")
+	s.Info.Println(film)
+	var valid bool = true
+	valid = valid && len(film.Name) > 1 && len(film.Name) < 150
+	valid = valid && len(film.About) < 1000
+	valid = valid && film.Rating >= 0 && film.Rating <= 10
+	valid = valid && film.Id == 0
+	if !valid {
+		s.Error.Println("invalide data about film")
+		return errors.New("полученные данные про фильм не корректные")
+	}
+	s.Info.Println("start adding film")
+	e := s.DatabaseConnector.AddFilmWithActor(context.Background(), film)
+	if e != nil {
+		s.Error.Println("error adding film")
+		return e
+	}
+	s.Info.Println("finised adding film")
+	return nil
 }

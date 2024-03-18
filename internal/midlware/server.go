@@ -56,6 +56,8 @@ func NewRouter(host string, port string, service service.ServiceInterface) *Rout
 	r.Info.Println("added /addConnectionBetweenActorAndFilm midlware")
 	mux.HandleFunc("/addConnectionBetweenActorAndFilm", r.addConnectionBetweenActorAndFilm)
 	r.Info.Println("added /addConnectionBetweenActorAndFilm midlware")
+	mux.HandleFunc("/addFilmWithActor", r.addFilmWithActor)
+	r.Info.Println("added /addFilmWithActor midlware")
 
 	r.Server = &http.Server{
 		Addr:    host + ":" + port,
@@ -811,4 +813,56 @@ func (r *Router) getdatafromrequest(response http.ResponseWriter, request *http.
 	}
 	r.Info.Println("saved data for uri " + request.RequestURI + " for session " + request.Header.Get("session"))
 	return data, true
+}
+
+// swagger:route POST /addFilmWithActor  addFilmWithActor
+//
+// # add one film
+// ---
+// Consumes:
+//	 - application/json
+// Parameters:
+//
+//   + name: session
+//     in: header
+//     description: current session of user (we can use some computers in one time for one user)
+//     required: true
+//     type: string
+//
+//   + name: film
+//     in: body
+//     description: create film in database
+//     required: true
+//	   type: film
+//
+//
+// Responses:
+//	200:
+//	405:
+//	400:
+//	500:
+
+func (r *Router) addFilmWithActor(response http.ResponseWriter, request *http.Request) {
+	defer request.Body.Close()
+	if !r.checkrequestmethond(response, request) {
+		return
+	}
+	if !r.checkrequestpermission(response, request, entity.AdminPermission) {
+		return
+	}
+	data, ok := r.getdatafromrequest(response, request)
+	if !ok {
+		return
+	}
+
+	e := r.Service.AddFilmWithActor(data)
+	if e != nil {
+		r.Error.Println("incorrect response for uri " + request.RequestURI + " and session " + request.Header.Get("session"))
+		r.Error.Println(e)
+		response.Header().Set("Content-Type", "text/html")
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(fmt.Sprintf("<h1>500 Internal Server Error</h1><p>%s</p>", e)))
+		return
+	}
+	r.Info.Println("correct response for uri " + request.RequestURI + " and session " + request.Header.Get("session"))
 }

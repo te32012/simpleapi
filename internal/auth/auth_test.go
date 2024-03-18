@@ -2,6 +2,7 @@ package auth_test
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"log"
@@ -55,11 +56,14 @@ func (db *Databasemock) AddActorFilmConnection(ctx context.Context, id_actor, id
 func (db *Databasemock) DeleteActorFilmConnection(ctx context.Context, id_actor, id_film int) error {
 	return nil
 }
+func (c *Databasemock) AddFilmWithActor(ctx context.Context, film entity.Film) error {
+	return nil
+}
 
 func TestAuthService(t *testing.T) {
 	auth := auth.NewAutService(&Databasemock{}, log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile), log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile))
-	userhash = fmt.Sprintf("%x", auth.Hasher.Sum([]byte("pswd")))
-	adminhash = fmt.Sprintf("%x", auth.Hasher.Sum([]byte("admin")))
+	userhash = fmt.Sprintf("%x", sha256.Sum256([]byte("pswd")))
+	adminhash = fmt.Sprintf("%x", sha256.Sum256([]byte("admin")))
 
 	hash, e := auth.LoginUser("user", "pswd")
 	if e != nil {
@@ -91,7 +95,7 @@ func TestAuthService(t *testing.T) {
 		t.Fatal()
 		return
 	}
-	_, ok = auth.CheckUserIsLoginedAndHasPermission(hash, -1)
+	_, ok = auth.CheckUserIsLoginedAndHasPermission("user", -1)
 	if ok {
 		t.Fatal()
 		return

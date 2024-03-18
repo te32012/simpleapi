@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 	"vktestgo2024/internal/entity"
@@ -166,7 +167,13 @@ func (db *Databasemock) DeleteActorFilmConnection(ctx context.Context, id_actor,
 	}
 	return nil
 }
-
+func (s *Databasemock) AddFilmWithActor(ctx context.Context, film entity.Film) error {
+	if film.Name == "alive" {
+		return nil
+	} else {
+		return errors.New("тестовая ошибка")
+	}
+}
 func TestService(t *testing.T) {
 	service := service.NewService(&authmock{}, &Databasemock{})
 	s, _ := service.Login("a", "a")
@@ -589,6 +596,35 @@ func TestService(t *testing.T) {
 	data, _ = json.Marshal(connection)
 
 	e = service.AddConnectionBetweenActorAndFilm(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+
+	var film99 entity.Film
+	film99.Name = "alive"
+	film99.Rating = 10
+	film99.ReleaseDate = time.Now()
+	film99.About = "good film"
+	film99.Actors = append(film99.Actors, actor)
+
+	data, _ = json.Marshal(film99)
+
+	e = service.AddFilmWithActor(data)
+	if e != nil {
+		t.Fatal(e)
+	}
+	film99.Name = "alive2"
+
+	data, _ = json.Marshal(film99)
+	fmt.Printf("%s", data)
+	e = service.AddFilmWithActor(data)
+	if e == nil {
+		t.Fatal(e)
+	}
+	data, _ = json.Marshal(film99)
+
+	data = append(data, 1)
+	e = service.AddFilmWithActor(data)
 	if e == nil {
 		t.Fatal(e)
 	}

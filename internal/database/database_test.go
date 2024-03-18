@@ -272,4 +272,18 @@ func TestDB(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	var film99 entity.Film
+	film99.Name = "alive"
+	film99.Rating = 10
+	film99.ReleaseDate = time.Now()
+	film99.About = "good film"
+	film99.Actors = append(film99.Actors, entity.Actor{Name: "xxx", Sex: "male", DataOfBirthday: time.Now()})
+	film99.Actors = append(film99.Actors, entity.Actor{Name: "xxxx", Sex: "male", DataOfBirthday: time.Now()})
+
+	err = conector.AddFilmWithActor(context.Background(), film99)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 }

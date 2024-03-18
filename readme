@@ -1,0 +1,7 @@
+для запуска  
+
+git clone
+
+docker-compose up
+
+api взаимодействия находится в папке cmd и генерируется с помощью go:generate

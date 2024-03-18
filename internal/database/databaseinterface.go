@@ -21,4 +21,5 @@ type DatabaseConnectorInterface interface {
 	GetListFilmByActorId(ctx context.Context, id_actor int) ([]entity.Film, error)
 	AddActorFilmConnection(ctx context.Context, id_actor, id_film int) error
 	DeleteActorFilmConnection(ctx context.Context, id_actor, id_film int) error
+	AddFilmWithActor(ctx context.Context, film entity.Film) error
 }

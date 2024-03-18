@@ -122,6 +122,13 @@ func (s *servicemock) DeleteConnectionBetweenActorAndFilm(data []byte) error {
 	}
 	return errors.New("тестовая ошибка findinfilm")
 }
+func (s *servicemock) AddFilmWithActor(data []byte) error {
+	fmt.Println(len(data))
+	if len(data) == 1 && data[0] == 1 {
+		return nil
+	}
+	return errors.New("тестовая ошибка findinfilm")
+}
 
 func TestRouter(t *testing.T) {
 	ha := sha256.Sum256([]byte("admin" + time.Now().GoString()))
@@ -641,6 +648,44 @@ func TestRouter(t *testing.T) {
 	}
 
 	req, _ = http.NewRequest("GET", "http://localhost:2024/deleteConnectionBetweenActorAndFilm", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("GET", "http://localhost:2024/addFilmWithActor", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp2)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+
+	req, _ = http.NewRequest("POST", "http://localhost:2024/addFilmWithActor", bytes.NewReader([]byte{1}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode == http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+	req, _ = http.NewRequest("POST", "http://localhost:2024/addFilmWithActor", bytes.NewReader([]byte{0}))
+	req.Header.Set("session", tmp1)
+
+	resp, _ = client.Do(req)
+
+	tmp, _ = io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK && resp.Header.Get("session") == tmp2 && len(tmp) == 1 && tmp[0] == 1 {
+		t.Fatal(resp.StatusCode, resp.Header.Get("session"))
+	}
+	req, _ = http.NewRequest("POST", "http://localhost:2024/addFilmWithActor", bytes.NewReader([]byte{0}))
 	req.Header.Set("session", tmp2)
 
 	resp, _ = client.Do(req)

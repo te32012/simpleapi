@@ -57,3 +57,16 @@
     "rating": 2
 }
 
+"фильм с вложенными актерами"
+{
+    "name": "kino98",
+    "about": "good film",
+    "releasedate": "1959-03-05T00:00:00Z",
+    "rating": 2,
+    "actors": {
+        "name": "acterses",
+        "sex": "male",
+        "dataofbirthday": "1978-03-05T00:00:00Z"
+    }
+}
+

@@ -54,7 +54,7 @@ BEGIN
 	namefilms := (select ARRAY[films.nameoffilm] from films where id_f = films.id);
 	id_actors := ARRAY(select actors_films.id_actors from actors_films where actors_films.id_films = id_f);
 	i := 1;
-	RAISE NOTICE 'cmd: %', i;
+	RAISE NOTICE 'cmd: %', id_f;
 	RAISE NOTIcE 'cmd1: %', array_length(id_actors, 1);
 
 	<<e>>
@@ -120,7 +120,7 @@ INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (selec
 with a as (
         INSERT INTO actors(nameActor, sex, dataofbirthday) VALUES ('anna', 'female', '03-05-1998') RETURNING id
 ), f as (
-    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino9', 'good film', '03-05-1959', 2) RETURNING id
+    INSERT INTO films(nameOfFilm, about, releaseDate, rating) VALUES ('kino', 'good film', '03-05-1959', 2) RETURNING id
 )
 INSERT into actors_films(id_films, id_actors) VALUES ((select id from a), (select id from f));
 

@@ -163,7 +163,9 @@ func (c *DatabaseConnector) GetActor(ctx context.Context, actor entity.Actor) (*
 	}
 	defer stm.Close()
 
-	r, err := stm.QueryContext(ctx, actor.Name, actor.DataOfBirthday)
+	var r *sql.Rows
+
+	r, err = stm.QueryContext(ctx, actor.Name, actor.DataOfBirthday)
 	if err != nil {
 		c.ERROR.Println("error query to db")
 		return nil, err
@@ -311,7 +313,6 @@ func (c *DatabaseConnector) AddFilm(ctx context.Context, film entity.Film) error
 	}
 	c.INFO.Println("finish add film in db")
 	return nil
-
 }
 
 func (c *DatabaseConnector) GetFilm(ctx context.Context, film entity.Film) (*entity.Film, error) {
@@ -525,7 +526,9 @@ func (c *DatabaseConnector) FindInFilm(ctx context.Context, fragment string) ([]
 		if err != nil {
 			return nil, err
 		}
-		ans = append(ans, *f)
+		if f != nil {
+			ans = append(ans, *f)
+		}
 	}
 	if len(ans) > 0 {
 		return ans, nil
@@ -638,5 +641,127 @@ func (c *DatabaseConnector) DeleteActorFilmConnection(ctx context.Context, id_ac
 		return errors.New("не было изменено ни одной строки в базе")
 	}
 	c.INFO.Println("finish delete connection between film and actor")
+	return nil
+}
+
+func (c *DatabaseConnector) AddFilmWithActor(ctx context.Context, film entity.Film) error {
+	c.INFO.Println("start add film in db")
+	q1 := "INSERT INTO films (nameOfFilm, about, releaseDate, rating) VALUES ($1, $2, $3, $4) RETURNING id;"
+	q2 := "INSERT INTO actors (nameActor, sex, dataofbirthday) VALUES ($1, $2, $3) RETURNING id;"
+	q3 := "INSERT INTO actors_films (id_films, id_actors) VALUES ($1, $2);"
+
+	if c.IsTest {
+		q1 = "INSERT|films|nameOfFilm=?,about=?,releaseDate=?,rating=?"
+		q2 = "INSERT|actors|nameActor=?,sex=?,dataofbirthday=?"
+		q3 = "INSERT|actors_films|id_films=?,id_actors=?"
+	}
+
+	stm, err := c.Base.PrepareContext(ctx, q1)
+	if err != nil {
+		return err
+	}
+	defer stm.Close()
+	stm7, err := c.Base.PrepareContext(ctx, q2)
+	if err != nil {
+		return err
+	}
+	defer stm7.Close()
+	stm3, err := c.Base.PrepareContext(ctx, q3)
+	if err != nil {
+		return err
+	}
+	defer stm3.Close()
+
+	tx, err := c.Base.Begin()
+	if err != nil {
+		return err
+	}
+	res, err := tx.StmtContext(ctx, stm).QueryContext(ctx, film.Name, film.About, film.ReleaseDate, film.Rating)
+	if err != nil {
+		return err
+	}
+
+	var id int
+	for res.Next() {
+		err = res.Scan(&id)
+	}
+	res.Close()
+
+	for i := 0; i < len(film.Actors); i++ {
+
+		actor, err := c.GetActor(ctx, film.Actors[i])
+		if err != nil {
+			res, err := tx.StmtContext(ctx, stm7).QueryContext(ctx, film.Actors[i].Name, film.Actors[i].Sex, film.Actors[i].DataOfBirthday)
+			if err != nil {
+				c.ERROR.Println("error add statment in tx")
+				return err
+			}
+			var id2 int
+			if res.Next() {
+				err = res.Scan(&id2)
+			} else {
+				return errors.New("не вставлено")
+			}
+			res.Close()
+			_, err = tx.StmtContext(ctx, stm3).ExecContext(ctx, id, id2)
+			if err != nil {
+				c.ERROR.Println("error add statment in tx")
+				return err
+			}
+		} else {
+			stm4, err := c.Base.PrepareContext(ctx, q3)
+			if err != nil {
+				return err
+			}
+			defer stm4.Close()
+			_, err = tx.StmtContext(ctx, stm4).ExecContext(ctx, id, actor.Id)
+			if err != nil {
+				c.ERROR.Println("error add statment in tx")
+				return err
+			}
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	c.INFO.Println("finish add film in db")
+	return nil
+}
+func (c *DatabaseConnector) Updatekeywords(next chan int) error {
+	c.INFO.Println("start update keywords name in db")
+	defer c.ERROR.Println("finish update keywords name in db")
+	defer func() {
+		next <- 1
+	}()
+	rows, err := c.Base.QueryContext(context.Background(), "SELECT id from films;")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int
+
+		rows2, err := c.Base.Query("SELECT id_films from fulltextsearch where id_films = $1;", id)
+		if err != nil {
+			return err
+		}
+		defer rows2.Close()
+		if rows2.Next() {
+			rows2.Scan(&id)
+			_, err := c.Base.Query("UPDATE fulltextsearch set keyworld=make_tsvector($1) where id_films=$2;", id, id)
+			if err != nil {
+				return err
+			}
+		} else {
+			_, err := c.Base.Query("INSERT into fulltextsearch (id_films, keyworld) values ($1, make_tsvector($2));", id, id)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	c.INFO.Println("следующая итерация")
+	rows.Close()
 	return nil
 }
