@@ -63,10 +63,12 @@
     "about": "good film",
     "releasedate": "1959-03-05T00:00:00Z",
     "rating": 2,
-    "actors": {
+    "actors": [ 
+        {
         "name": "acterses",
         "sex": "male",
         "dataofbirthday": "1978-03-05T00:00:00Z"
-    }
+        }
+    ]
 }
 
