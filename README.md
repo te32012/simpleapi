@@ -1,4 +1,4 @@
-[![build compose file](https://github.com/te32012/simpleapi/actions/workflows/main.yml/badge.svg)]
+![build compose file](https://github.com/te32012/simpleapi/actions/workflows/main.yml/badge.svg)
 
 
 для запуска  
